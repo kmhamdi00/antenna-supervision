@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: antenna_app
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: "postgresql://app:app@database:5432/antenna_supervision?serverVersion=16&charset=utf8"
+      API_KEY: "super-secret-api-key-change-me"
+    command: >
+      sh -c "composer install --no-interaction --prefer-dist &&
+             php -S 0.0.0.0:8000 -t public"
+
+  database:
+    image: postgres:16-alpine
+    container_name: antenna_db
+    environment:
+      POSTGRES_DB: antenna_supervision
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d antenna_supervision"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db_data:
