@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Antenna;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Enum\AntennaStatus;
 
 /**
  * @extends ServiceEntityRepository<Antenna>
