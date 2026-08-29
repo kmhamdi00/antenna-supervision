@@ -13,22 +13,17 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-/**
- * Formate toutes les erreurs des routes /api en JSON homogène :
- *
- *   { "error": { "code": "...", "message": "...", "details": [...] } }
- *
- * plutôt que de laisser Symfony renvoyer sa page d'erreur HTML par défaut.
- */
 #[AsEventListener(event: 'kernel.exception', priority: 0)]
 class ApiExceptionListener
 {
+    public function __construct(private readonly bool $debug) {}
+
     public function __invoke(ExceptionEvent $event): void
     {
         $request = $event->getRequest();
 
         if (!str_starts_with($request->getPathInfo(), '/api')) {
-            return; // laisse le comportement par défaut (page HTML) pour le dashboard
+            return;
         }
 
         $exception = $event->getThrowable();
@@ -81,6 +76,14 @@ class ApiExceptionListener
         $payload = ['error' => ['code' => $code, 'message' => $message]];
         if ([] !== $details) {
             $payload['error']['details'] = $details;
+        }
+
+        if ($this->debug && Response::HTTP_INTERNAL_SERVER_ERROR === $status) {
+            $payload['error']['debug'] = [
+                'exception' => get_class($exception),
+                'real_message' => $exception->getMessage(),
+                'file' => $exception->getFile() . ':' . $exception->getLine(),
+            ];
         }
 
         $event->setResponse(new JsonResponse($payload, $status));

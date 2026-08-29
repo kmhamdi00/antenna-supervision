@@ -23,6 +23,9 @@ services:
   App\Security\ApiKeyAuthenticator:
     arguments:
       $expectedApiKey: "%api_key%"
+  App\EventListener\ApiExceptionListener:
+    arguments:
+      $debug: "%kernel.debug%"
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Antenna;
 use App\Entity\Intervention;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
