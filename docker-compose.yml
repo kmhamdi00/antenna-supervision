@@ -12,7 +12,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      APP_ENV: dev
       DATABASE_URL: "postgresql://app:app@database:5432/antenna_supervision?serverVersion=16&charset=utf8"
       API_KEY: "super-secret-api-key-change-me"
     command: >
